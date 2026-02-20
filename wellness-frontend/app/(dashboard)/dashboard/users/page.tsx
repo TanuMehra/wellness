@@ -77,7 +77,15 @@ interface UserType {
   lastName: string;
   email: string;
   phone: string;
-  role: "Admin" | "Doctor" | "Influencer" | "Customer" | "admin" | "doctor" | "influencer" | "customer";
+  role:
+    | "Admin"
+    | "Doctor"
+    | "Influencer"
+    | "Customer"
+    | "admin"
+    | "doctor"
+    | "influencer"
+    | "customer";
   status: "Active" | "Inactive" | "active" | "inactive";
   imageUrl?: string;
   verified: boolean;
@@ -315,9 +323,8 @@ const UsersPage = () => {
   const handleDeleteUser = async () => {
     // Prevent deleting admin users (check both lowercase and capitalized formats)
     const isAdminUser =
-      selectedUser?.role === "Admin" ||
-      selectedUser?.role === "admin";
-    
+      selectedUser?.role === "Admin" || selectedUser?.role === "admin";
+
     if (!selectedUser || isAdminUser) return;
 
     Swal.fire({
@@ -1752,12 +1759,11 @@ const UsersPage = () => {
                 Are you sure you want to delete {selectedUser?.firstName}{" "}
                 {selectedUser?.lastName}? This action cannot be undone.
                 {(selectedUser?.role === "Admin" ||
-                  selectedUser?.role === "admin") && (  
+                  selectedUser?.role === "admin") && (
                   <span className="text-red-500 font-semibold">
                     {" "}
                     Admin users cannot be deleted.
-                  </span> 
-                
+                  </span>
                 )}
               </DialogDescription>
             </DialogHeader>
@@ -1776,7 +1782,6 @@ const UsersPage = () => {
                   isLoading ||
                   selectedUser?.role === "Admin" ||
                   selectedUser?.role === "admin"
-                
                 }
               >
                 {modalLoading ? (

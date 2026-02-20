@@ -139,14 +139,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 {isEditing ? (
                   <Input
                     id="firstName"
-                    value={currentUser?.firstName || ""}
+                    value={profile?.firstName || ""}
                     onChange={(e) =>
                       handleFieldChange("firstName", e.target.value)
                     }
                   />
                 ) : (
                   <p className="text-sm font-medium">
-                    {currentUser?.firstName || "Not set"}
+                    {profile?.firstName || "Not set"}
                   </p>
                 )}
               </div>
@@ -155,14 +155,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 {isEditing ? (
                   <Input
                     id="lastName"
-                    value={currentUser?.lastName || ""}
+                    value={profile?.lastName || ""}
                     onChange={(e) =>
                       handleFieldChange("lastName", e.target.value)
                     }
                   />
                 ) : (
                   <p className="text-sm font-medium">
-                    {currentUser?.lastName || "Not set"}
+                    {profile?.lastName || "Not set"}
                   </p>
                 )}
               </div>
@@ -175,12 +175,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   <Input
                     id="email"
                     type="email"
-                    value={currentUser?.email || ""}
+                    value={profile?.email || ""}
                     onChange={(e) => handleFieldChange("email", e.target.value)}
                   />
                 ) : (
                   <p className="text-sm font-medium">
-                    {currentUser?.email || "Not set"}
+                    {profile?.email || "Not set"}
                   </p>
                 )}
               </div>
@@ -189,12 +189,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 {isEditing ? (
                   <Input
                     id="phone"
-                    value={currentUser?.phone || ""}
+                    value={profile?.phone || ""}
                     onChange={(e) => handleFieldChange("phone", e.target.value)}
                   />
                 ) : (
                   <p className="text-sm font-medium">
-                    {currentUser?.phone || "Not set"}
+                    {profile?.phone || "Not set"}
                   </p>
                 )}
               </div>
@@ -204,13 +204,13 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
               <div>
                 <Label htmlFor="role">Role</Label>
                 <p className="text-sm font-medium capitalize">
-                  {currentUser?.role || "Not set"}
+                  {profile?.role || "Not set"}
                 </p>
               </div>
               <div>
                 <Label htmlFor="status">Status</Label>
                 <p className="text-sm font-medium capitalize">
-                  {currentUser?.status || "Not set"}
+                  {profile?.status || "Not set"}
                 </p>
               </div>
             </div>
@@ -221,13 +221,13 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 {isEditing ? (
                   <Input
                     id="bio"
-                    value={currentUser?.bio || ""}
+                    value={profile?.bio || ""}
                     onChange={(e) => handleFieldChange("bio", e.target.value)}
                     placeholder="Enter your bio"
                   />
                 ) : (
                   <p className="text-sm font-medium">
-                    {currentUser?.bio || "Not specified"}
+                    {profile?.bio || "Not specified"}
                   </p>
                 )}
               </div>
@@ -236,7 +236,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 {isEditing ? (
                   <Input
                     id="address"
-                    value={currentUser?.address || ""}
+                    value={profile?.address || ""}
                     onChange={(e) =>
                       handleFieldChange("address", e.target.value)
                     }
@@ -244,7 +244,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                   />
                 ) : (
                   <p className="text-sm font-medium">
-                    {currentUser?.address || "Not specified"}
+                    {profile?.address || "Not specified"}
                   </p>
                 )}
               </div>
@@ -256,14 +256,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 <Input
                   id="dateOfBirth"
                   type="date"
-                  value={currentUser?.dateOfBirth || ""}
+                  value={profile?.dateOfBirth || ""}
                   onChange={(e) =>
                     handleFieldChange("dateOfBirth", e.target.value)
                   }
                 />
               ) : (
                 <p className="text-sm font-medium">
-                  {currentUser?.dateOfBirth || "Not specified"}
+                  {profile?.dateOfBirth || "Not specified"}
                 </p>
               )}
             </div>

@@ -4,11 +4,11 @@ import User from "../models/userModel.js";
 export const isLogin = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Could not find authentication token. Please log in again." 
+      return res.status(401).json({
+        success: false,
+        message: "Could not find authentication token. Please log in again."
       });
     }
 
@@ -18,11 +18,11 @@ export const isLogin = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Token missing" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+    const decoded = jwt.verify(token, process.env.JWT_TOKEN);
+
     // Find user and attach to request (exclude password)
     const user = await User.findById(decoded.id || decoded._id).select("-password");
-    
+
     if (!user) {
       return res.status(401).json({ success: false, message: "User not found" });
     }

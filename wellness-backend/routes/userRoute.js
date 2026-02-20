@@ -20,11 +20,11 @@ const router = Router();
 // Routes
 router.post("/", upload.single("imageUrl"), createUser);          // Create user
 router.get("/", getUsers);             // Get all users
-router.get("/count",getTotalUsersCount)
+router.get("/count", getTotalUsersCount)
 router.get("/customer/admin/count", isLogin, isAdmin, countCustomers);
-router.put("/update-profile", isLogin, upload.single("image"), updateUserProfile);
+router.patch("/update-profile", isLogin, upload.single("image"), updateUserProfile);
 router.get("/:id", getUserById);       // Get user by ID
-router.put("/:id", upload.single("imageUrl"), updateUser);        // Update user
+router.patch("/:id", upload.single("imageUrl"), updateUser);        // Update user
 router.delete("/:id", deleteUser);     // Delete user
 
 

@@ -24,50 +24,70 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats: initialStats }) => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      try {
-        setLoading(true)
-        setError(null)
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token')
 
-        const token = localStorage.getItem('authToken') || localStorage.getItem('token')
-
-        if (!token) {
-          setLoading(false)
-          return
-        }
-
-        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/v1`
-        const headers = {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-
-        // Fetch both stats in parallel
-        // Note: We do NOT pass userId in the URL for total-amount
-        const [countRes, amountRes] = await Promise.all([
-          fetch(`${apiUrl}/orders/user/my-orders/count`, { headers }),
-          fetch(`${apiUrl}/total-amount`, { headers })
-        ])
-
-        if (!countRes.ok || !amountRes.ok) {
-          throw new Error('Failed to fetch stats')
-        }
-
-        const countData = await countRes.json()
-        const amountData = await amountRes.json()
-
-        if (countData.success) {
-          setTotalOrders(countData.totalOrders)
-        }
-
-        if (amountData.success) {
-          setTotalSpent(amountData.totalSpent)
-        }
-      } catch (err) {
-        console.error('Error fetching stats:', err)
-        setError('Failed to load')
-      } finally {
+      if (!token) {
         setLoading(false)
+        return
       }
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/v1`
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+
+      setLoading(true)
+      setError(null)
+
+      // Fetch both stats in parallel, handle each independently
+      const [countRes, amountRes] = await Promise.allSettled([
+        fetch(`${apiUrl}/orders/user/my-orders/count`, { headers }),
+        fetch(`${apiUrl}/total-amount`, { headers })
+      ])
+
+      let hasError = false
+
+      // Handle order count
+      if (countRes.status === 'fulfilled') {
+        if (countRes.value.ok) {
+          try {
+            const countData = await countRes.value.json()
+            if (countData.success) setTotalOrders(countData.totalOrders)
+          } catch {
+            console.error('Failed to parse order count response')
+            hasError = true
+          }
+        } else {
+          console.error(`Order count endpoint failed: ${countRes.value.status} ${countRes.value.statusText} — URL: ${apiUrl}/orders/user/my-orders/count`)
+          hasError = true
+        }
+      } else {
+        console.error('Order count request failed (network error):', countRes.reason)
+        hasError = true
+      }
+
+      // Handle total amount
+      if (amountRes.status === 'fulfilled') {
+        if (amountRes.value.ok) {
+          try {
+            const amountData = await amountRes.value.json()
+            if (amountData.success) setTotalSpent(amountData.totalSpent)
+          } catch {
+            console.error('Failed to parse total amount response')
+            hasError = true
+          }
+        } else {
+          console.error(`Total amount endpoint failed: ${amountRes.value.status} ${amountRes.value.statusText} — URL: ${apiUrl}/total-amount`)
+          hasError = true
+        }
+      } else {
+        console.error('Total amount request failed (network error):', amountRes.reason)
+        hasError = true
+      }
+
+      if (hasError) setError('Failed to load')
+      setLoading(false)
     }
 
     fetchStats()

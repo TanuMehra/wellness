@@ -103,7 +103,8 @@ app.use('/v1/sessions', sessionRoute);
 app.use('/v1/popups', popupRoute);
 app.use('/v1/newsletters', newsLetterRoute);
 app.use('/v1/contacts', contactRoute);
-//doctor
+
+//doctor routes
 app.use('/v1/doctor', doctorRoute);
 app.use("/v1/appointments", appointmentRoute);
 app.use('/v1/patients', patientRoute);

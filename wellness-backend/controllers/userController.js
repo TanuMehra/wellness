@@ -12,14 +12,14 @@ export const createUser = async (req, res) => {
     if (req.file) {
       data.imageUrl = await uploadToS3(req.file);
     }
-    
+
     // Check if email already exists
     const existingUser = await User.findOne({ email: data.email });
     if (existingUser) {
       return res.status(400).json({ success: false, message: "Email already exists" });
     }
 
-    const user =await User.create(data);
+    const user = await User.create(data);
 
     res.status(201).json({ success: true, message: "User created successfully", user });
   } catch (error) {
@@ -43,21 +43,24 @@ export const updateUserProfile = async (req, res) => {
     if (firstName !== undefined) user.firstName = firstName;
     if (lastName !== undefined) user.lastName = lastName;
     if (email !== undefined) user.email = email;
-    if (phone !== undefined) user.phone = phone;
+    if (!phone && !user.phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number required"
+      });
+    }
+
     if (bio !== undefined) user.bio = bio;
 
     // Handle optional image upload
     if (req.file) {
-      // Check for old image in profileImage (or legacy imageUrl) to delete
-      const oldImage = user.profileImage || user.imageUrl;
-      
-      if (oldImage) {
-        await deleteOldImage(oldImage);
+      if (user.imageUrl) {
+        await deleteOldImage(user.imageUrl);
       }
-      
-      // Upload new image to S3 and save URL in profileImage field
-      user.profileImage = await uploadToS3(req.file);
+
+      user.imageUrl = await uploadToS3(req.file);
     }
+
 
     // Save the user
     await user.save();
@@ -140,7 +143,7 @@ export const getTotalUsersCount = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error', error: error.message });
   }
-} 
+}
 
 
 // Get single user by ID
