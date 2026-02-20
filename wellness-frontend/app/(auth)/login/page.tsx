@@ -32,6 +32,7 @@ import {
   getDashboardForRole,
 } from "@/lib/utils/auth";
 import Image from "next/image";
+import Swal from "sweetalert2";
 
 const LoginContent = () => {
   const router = useRouter();
@@ -85,6 +86,11 @@ const LoginContent = () => {
         (result.success ||
           (result.message === "login successful" && result.session))
       ) {
+        Swal.fire({
+          title: "Login Successful",
+          text: "Welcome back!",
+          icon: "success",
+        });
         const { session } = result;
 
         storeAuthData(session);
@@ -121,9 +127,19 @@ const LoginContent = () => {
           router.replace(safeRedirect || "/profile");
         }
       } else {
+        Swal.fire({
+          title: "Login Failed",
+          text: result?.message || "Invalid credentials",
+          icon: "error",
+        });
       }
     } catch (error) {
       console.error("Login error:", error);
+      Swal.fire({
+        title: "Login Failed",
+        text: (error as any)?.message || "Invalid credentials",
+        icon: "error",
+      });
     }
   };
 
@@ -414,4 +430,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

@@ -34,6 +34,7 @@ import {
   setDefaultAddress,
   Address,
 } from "@/lib/redux/features/addressSlice";
+import Swal from "sweetalert2";
 import { selectUser } from "@/lib/redux/features/authSlice";
 
 // Use the Address interface from addressSlice
@@ -80,34 +81,55 @@ const AddressTab: React.FC<AddressTabProps> = () => {
   };
 
   const handleAddAddress = async () => {
-    if (!currentUser?._id) return;
+    if (!currentUser?._id) {
+      Swal.fire("Error", "You must be logged in to manage addresses.", "error");
+      return;
+    }
 
-    if (editingAddress && editingAddressId) {
-      // Update existing address
-      const success = await dispatch(
-        updateAddress(
-          currentUser._id,
-          editingAddressId,
-          newAddress as AddressItem,
-        ),
-      );
-      if (success) {
-        setEditingAddress(null);
-        setEditingAddressId(null);
-        setShowAddDialog(false);
-        resetForm();
-        refreshAddresses();
+    try {
+      let actionResult;
+
+      if (editingAddress && editingAddressId) {
+        // Update existing address
+        actionResult = await dispatch(
+          updateAddress(
+            currentUser._id,
+            editingAddressId,
+            newAddress as AddressItem,
+          ),
+        );
+      } else {
+        // Add new address
+        actionResult = await dispatch(
+          addNewAddress(currentUser._id, newAddress as AddressItem),
+        );
       }
-    } else {
-      // Add new address
-      const success = await dispatch(
-        addNewAddress(currentUser._id, newAddress as AddressItem),
-      );
-      if (success) {
-        setShowAddDialog(false);
-        resetForm();
-        refreshAddresses();
+
+      // Check for Redux Toolkit rejected action or falsy return
+      if (
+        (actionResult as any)?.meta?.requestStatus === "rejected" ||
+        actionResult === false
+      ) {
+        throw new Error("Operation failed. Please try again.");
       }
+
+      Swal.fire({
+        icon: "success",
+        title: editingAddress
+          ? "Address updated successfully"
+          : "Address added successfully",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
+      setEditingAddress(null);
+      setEditingAddressId(null);
+      setShowAddDialog(false);
+      resetForm();
+      refreshAddresses();
+    } catch (err: any) {
+      console.error("Error saving address:", err);
+      Swal.fire("Save Failed", err.message || "An error occurred.", "error");
     }
   };
 
@@ -128,29 +150,76 @@ const AddressTab: React.FC<AddressTabProps> = () => {
   const handleEditAddress = (address: AddressItem) => {
     setEditingAddress(address);
     setEditingAddressId(address._id || null);
-    setNewAddress(address);
+    setNewAddress({
+      addressType: address.addressType || "Home",
+      name: address.name || "",
+      address: address.address || "",
+      city: address.city || "",
+      state: address.state || "",
+      pinCode: address.pinCode || "",
+      phone: address.phone || "",
+      landMark: address.landMark || "",
+      isDefault: address.isDefault || false,
+    });
     setShowAddDialog(true);
   };
 
   const handleDeleteAddress = async (addressId?: string) => {
-    if (!currentUser?._id) return;
-    if (!addressId) return;
+    if (!currentUser?._id || !addressId) return;
 
-    const success = await dispatch(deleteAddress(currentUser._id, addressId));
-    if (success) {
-      refreshAddresses();
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This address will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const success = await dispatch(deleteAddress(currentUser._id, addressId));
+        if (success) {
+          Swal.fire("Deleted!", "Your address has been deleted.", "success");
+          refreshAddresses();
+        } else {
+          throw new Error("Failed to delete the address.");
+        }
+      } catch (err: any) {
+        Swal.fire("Error!", err.message || "Could not delete address.", "error");
+      }
     }
   };
 
   const handleSetDefault = async (addressId?: string) => {
-    if (!currentUser?._id) return;
-    if (!addressId) return;
+    if (!currentUser?._id || !addressId) return;
 
-    const success = await dispatch(
-      setDefaultAddress(currentUser._id, addressId),
-    );
-    if (success) {
+    try {
+      const actionResult = await dispatch(
+        setDefaultAddress(currentUser._id, addressId),
+      );
+
+      if (
+        (actionResult as any)?.meta?.requestStatus === "rejected" ||
+        actionResult === false
+      ) {
+        throw new Error("Failed to set default address.");
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Default address updated successfully",
+        showConfirmButton: false,
+        timer: 1500,
+      });
       refreshAddresses();
+    } catch (err: any) {
+      Swal.fire(
+        "Error!",
+        err.message || "Could not update default address.",
+        "error",
+      );
     }
   };
 
