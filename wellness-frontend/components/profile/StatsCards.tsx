@@ -21,6 +21,8 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats: initialStats }) => {
   const [totalSpent, setTotalSpent] = useState<number>(initialStats.totalSpent)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [avgOrderValue, setAvgOrderValue] = useState<number>(initialStats.averageOrderValue)
+  const [aovLoading, setAovLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -93,6 +95,40 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats: initialStats }) => {
     fetchStats()
   }, [])
 
+  useEffect(() => {
+    const fetchAvgOrderValue = async () => {
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token')
+      if (!token) {
+        setAovLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/v1/orders/avg-order-value`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.success) {
+            setAvgOrderValue(data.avgOrderValue)
+            setTotalOrders(data.orderCount)
+            setTotalSpent(data.totalSpent)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch average order value', err)
+      } finally {
+        setAovLoading(false)
+      }
+    }
+
+    fetchAvgOrderValue()
+  }, [])
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gradient-to-br from-blue-50 to-blue-100">
@@ -146,7 +182,11 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats: initialStats }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-purple-600 font-medium">Avg Order Value</p>
-              <p className="text-3xl font-bold text-purple-900">₹{initialStats.averageOrderValue.toLocaleString()}</p>
+              {aovLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin text-purple-600 mt-1" />
+              ) : (
+                <p className="text-3xl font-bold text-purple-900">₹{avgOrderValue.toLocaleString()}</p>
+              )}
             </div>
             <div className="p-3 bg-purple-500 rounded-full">
               <TrendingUp className="w-8 h-8 text-white" />
