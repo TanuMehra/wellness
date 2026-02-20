@@ -1,4 +1,4 @@
-import { deleteOldImage, uploadToS3 } from "../config/s3Config.js";
+import { deleteOldImage, uploadFile } from "../config/s3Config.js";
 import User from "../models/userModel.js";
 
 // Create a new user
@@ -10,7 +10,7 @@ export const createUser = async (req, res) => {
       return res.status(400).json({ success: false, message: "First name, last name, email, and password are required" });
     }
     if (req.file) {
-      data.imageUrl = await uploadToS3(req.file);
+      data.imageUrl = await uploadFile(req.file);
     }
 
     // Check if email already exists
@@ -58,7 +58,7 @@ export const updateUserProfile = async (req, res) => {
         await deleteOldImage(user.imageUrl);
       }
 
-      user.imageUrl = await uploadToS3(req.file);
+      user.imageUrl = await uploadFile(req.file);
     }
 
 
@@ -168,7 +168,7 @@ export const updateUser = async (req, res) => {
     if (req.file) {
       const user = await User.findById(req.params.id);
       if (user?.imageUrl) await deleteOldImage(user.imageUrl);
-      updates.imageUrl = await uploadToS3(req.file);
+      updates.imageUrl = await uploadFile(req.file);
     }
 
     const user = await User.findByIdAndUpdate(req.params.id, updates, {
