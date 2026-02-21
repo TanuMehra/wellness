@@ -446,7 +446,7 @@ const DashboardPage = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                onClick={() => router.push("/dashboard/doctors?action=add")}
+                onClick={() => router.push("/dashboard/doctors")}
               >
                 <Stethoscope className="w-5 h-5 text-emerald-600" />
                 <span className="text-sm font-medium">Add Doctor</span>
@@ -454,7 +454,7 @@ const DashboardPage = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col items-center gap-2 hover:bg-indigo-50 dark:hover:bg-indigo-950"
-                onClick={() => router.push("/dashboard/influencers?action=add")}
+                onClick={() => router.push("/dashboard/influencers")}
               >
                 <Megaphone className="w-5 h-5 text-indigo-600" />
                 <span className="text-sm font-medium">Add Influencer</span>
