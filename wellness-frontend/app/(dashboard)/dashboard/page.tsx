@@ -414,7 +414,7 @@ const DashboardPage = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col items-center gap-2 hover:bg-blue-50 dark:hover:bg-blue-950"
-                onClick={() => router.push("/dashboard/users")}
+                onClick={() => router.push("/dashboard/users?action=add")}
               >
                 <Users className="w-5 h-5 text-blue-600" />
                 <span className="text-sm font-medium">Add User</span>
@@ -422,7 +422,7 @@ const DashboardPage = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col items-center gap-2 hover:bg-green-50 dark:hover:bg-green-950"
-                onClick={() => router.push("/dashboard/products")}
+                onClick={() => router.push("/dashboard/products?action=add")}
               >
                 <Package className="w-5 h-5 text-green-600" />
                 <span className="text-sm font-medium">Add Product</span>
@@ -446,7 +446,7 @@ const DashboardPage = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col items-center gap-2 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                onClick={() => router.push("/dashboard/doctors")}
+                onClick={() => router.push("/dashboard/doctors?action=add")}
               >
                 <Stethoscope className="w-5 h-5 text-emerald-600" />
                 <span className="text-sm font-medium">Add Doctor</span>
@@ -454,7 +454,7 @@ const DashboardPage = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col items-center gap-2 hover:bg-indigo-50 dark:hover:bg-indigo-950"
-                onClick={() => router.push("/dashboard/influencers")}
+                onClick={() => router.push("/dashboard/influencers?action=add")}
               >
                 <Megaphone className="w-5 h-5 text-indigo-600" />
                 <span className="text-sm font-medium">Add Influencer</span>

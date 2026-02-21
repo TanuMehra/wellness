@@ -43,6 +43,7 @@ import influencerNoteRoute from './routes/influencerNoteRoute.js';
 import influencerReportRoute from './routes/influencerReportRoute.js';
 import influencerSettingsRoute from './routes/influencerSettingsRoute.js';
 import influencerRoute from './routes/influencerRoute.js';
+import wishlistRoute from './routes/wishlistRoute.js';
 
 dotenv.config();
 
@@ -103,6 +104,7 @@ app.use('/v1/sessions', sessionRoute);
 app.use('/v1/popups', popupRoute);
 app.use('/v1/newsletters', newsLetterRoute);
 app.use('/v1/contacts', contactRoute);
+app.use('/v1/wishlist', wishlistRoute);
 
 //doctor routes
 app.use('/v1/doctor', doctorRoute);

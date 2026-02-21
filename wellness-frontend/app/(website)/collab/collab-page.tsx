@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ChevronDown, SlidersHorizontal, ShoppingCart, Filter, X, Star, Sparkles } from "lucide-react";
+import { ChevronDown, SlidersHorizontal, ShoppingCart, Filter, X, Star, Sparkles, Heart } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import CollabFeatured from "./collab-featured";
 import Image1 from "../../../public/1.jpg";
@@ -113,6 +113,37 @@ const ProductGrid = () => {
   const [error, setError] = useState("");
   const { addToCart, cartItems } = useCart();
   const router = useRouter(); // Keep for potential future use (e.g., go to cart)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+  const addToWishlist = async (productId: string) => {
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+
+      if (!token) {
+        Swal.fire("Login Required", "Please login first", "warning");
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/v1/wishlist/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        Swal.fire("Added to Wishlist ❤️", data.message, "success");
+      } else {
+        Swal.fire("Info", data.message, "info");
+      }
+    } catch (error) {
+      Swal.fire("Error", "Could not add to wishlist", "error");
+    }
+  };
 
   const searchParams = useSearchParams();
   const categoryFilter = searchParams.get("category");
@@ -440,6 +471,16 @@ const ProductGrid = () => {
                               </span>
                             </div>
                           )}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addToWishlist(product._id);
+                            }}
+                            className="absolute top-3 right-3 z-20 p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-full text-slate-400 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/30 transition-all shadow-sm"
+                          >
+                            <Heart className="w-5 h-5" />
+                          </button>
                           <div className="absolute inset-0 p-6 flex items-center justify-center">
                             <div className="relative w-full h-full transition-transform duration-700 ease-out group-hover:scale-110">
                               <Image src={product.images?.[0] || "/placeholder.png"} alt={product.name} fill className={`object-contain transition-opacity duration-500 ${product.images?.[1] ? 'group-hover:opacity-0' : ''}`} sizes="(max-width: 768px) 50vw, 33vw" />

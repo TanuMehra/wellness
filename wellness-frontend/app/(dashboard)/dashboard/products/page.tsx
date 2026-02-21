@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import {
   Plus,
   Search,
@@ -108,6 +109,7 @@ const ProductsPage = () => {
   const error = useAppSelector(selectProductsError);
   const filters = useAppSelector(selectProductsFilters);
   const pagination = useAppSelector(selectProductsPagination);
+  const searchParams = useSearchParams();
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -219,6 +221,12 @@ const ProductsPage = () => {
   useEffect(() => {
     dispatch(fetchProductsData());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (searchParams?.get("action") === "add") {
+      setShowAddModal(true);
+    }
+  }, [searchParams]);
 
   // Pagination logic using Redux pagination
   const totalPages = Math.ceil(pagination.total / pagination.limit);

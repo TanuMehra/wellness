@@ -1,63 +1,35 @@
 import mongoose from 'mongoose';
 import Order from '../models/orderModel.js';
+import Product from '../models/productsModel.js';
+import Coupon from '../models/couponModel.js';
 
 const isId = (id) => mongoose.isValidObjectId(id);
 
 
 export async function createOrder(req, res) {
   try {
-    console.log('📥 Received order data from user:', req.user._id);
+    console.log('📥 Received order creation request');
+    console.log('User ID from Token:', req.user?._id);
+    console.log('Request Body:', JSON.stringify(req.body, null, 2));
 
     const userId = req.user._id;
+    const orderData = { ...req.body, user: userId };
 
-    if (!req.body.orderNumber) {
-      return res.status(400).json({
-        success: false,
-        message: 'Order number is required'
-      });
-    }
-
-    if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
+    // Basic validation
+    if (!orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Order must have at least one item'
       });
     }
-
-    const productIds = req.body.items.map(item => item.product);
-    if (new Set(productIds).size !== productIds.length) {
-      return res.status(400).json({
-        success: false,
-        message: 'Duplicate products in order'
-      });
-    }
-
-    // Validate each item has valid quantity and price
-    for (let item of req.body.items) {
-      if (!item.quantity || item.quantity < 1 || !Number.isInteger(item.quantity)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid quantity for item ${item.product}`
-        });
-      }
-      if (item.price === undefined || item.price < 0 || !Number.isFinite(item.price)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid price for item ${item.product}`
-        });
-      }
-    }
-
-    if (!req.body.shippingAddress) {
+    if (!orderData.shippingAddress) {
       return res.status(400).json({
         success: false,
         message: 'Shipping address is required'
       });
     }
-    const orderData = {
-      ...req.body,
-      user: userId
-    };
+    
+    console.log('📝 Constructing Order Data:', JSON.stringify(orderData, null, 2));
 
     // Create the order
     const order = await Order.create(orderData);
@@ -72,8 +44,8 @@ export async function createOrder(req, res) {
 
     res.status(201).json({
       success: true,
-      message: 'Order created successfully',
-      data: populated
+      message: 'Order placed successfully',
+      order: populated
     });
 
   } catch (err) {
@@ -90,6 +62,7 @@ export async function createOrder(req, res) {
     // Handle validation errors
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(e => e.message);
+      console.error('❌ Mongoose Validation Errors:', err.errors);
       return res.status(400).json({
         success: false,
         message: 'Validation failed',

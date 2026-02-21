@@ -46,29 +46,14 @@ const LoginContent = () => {
 
   // Check if user is already logged in
   useEffect(() => {
-    if (isAuthenticated()) {
+    const token = localStorage.getItem("token");
+    if (token) {
       const redirectParam = searchParams.get("redirect");
       const safeRedirect =
         redirectParam && redirectParam.startsWith("/") ? redirectParam : null;
 
       if (safeRedirect) {
         router.push(safeRedirect);
-        return;
-      }
-
-      const userCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("user="));
-
-      if (userCookie) {
-        try {
-          const user = JSON.parse(decodeURIComponent(userCookie.split("=")[1]));
-          const dashboardUrl = getDashboardForRole(user.role);
-          router.push(dashboardUrl);
-        } catch (error) {
-          console.error("Error parsing user cookie:", error);
-          router.push("/profile");
-        }
       } else {
         router.push("/profile");
       }
@@ -94,6 +79,7 @@ const LoginContent = () => {
         const { session } = result;
 
         storeAuthData(session);
+        localStorage.setItem("token", session.token);
 
         let userDetails = result.user;
 

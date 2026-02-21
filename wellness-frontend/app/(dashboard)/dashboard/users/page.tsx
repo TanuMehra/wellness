@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -107,6 +108,7 @@ const userRoles = ["All", "Admin", "Doctor", "Influencer", "Customer"];
 const userStatuses = ["All", "Active", "Inactive"];
 
 const UsersPage = () => {
+  const searchParams = useSearchParams();
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -242,6 +244,12 @@ const UsersPage = () => {
   useEffect(() => {
     fetchUsers();
   }, [pagination.page, filters]);
+
+  useEffect(() => {
+    if (searchParams?.get("action") === "add") {
+      setShowAddModal(true);
+    }
+  }, [searchParams]);
 
   // Pagination logic using Redux pagination
   const totalPages = Math.ceil(pagination.total / pagination.limit);
